@@ -57,8 +57,3 @@ La idea fue comparar el rendimiento usando un solo hilo contra cargas masivas de
 ![Prueba con 1 Hilo](images/1Hilo.png)
 ![Prueba con 100 mil Hilos](images/100kHilos.png)
 ![Prueba con 1 millon de Hilos](images/1MHilos.png)
-
-## Como ejecutar este proyecto
-1 Entra a la carpeta de java con el comando cd src/java
-2 Compila los archivos de Java con el comando javac *.java
-3 Ejecuta el programa principal con el comando java Main
