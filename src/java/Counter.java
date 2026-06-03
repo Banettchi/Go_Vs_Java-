@@ -1,97 +1,97 @@
 
 public class Counter {
 
-    static final long TOTAL_INICIO = 1L;
-    static final long TOTAL_FIN = 50_000_000L;
+    static final long RANGE_START = 1L;
+    static final long RANGE_END = 50_000_000L;
 
-    public static void ejecutar(int numHilos) throws InterruptedException {
+    public static void ejecutar(int numThreads) throws InterruptedException {
 
-        System.out.println("Rango total: " + TOTAL_INICIO + " -> " + TOTAL_FIN);
-        System.out.println("Hilos Java:  " + numHilos);
+        System.out.println("Total range: " + RANGE_START + " -> " + RANGE_END);
+        System.out.println("Java threads: " + numThreads);
         System.out.println();
 
-        long totalNumeros = TOTAL_FIN - TOTAL_INICIO + 1;
-        long rangoPorHilo = totalNumeros / numHilos;
-        long resto = totalNumeros % numHilos;
+        long totalNumbers = RANGE_END - RANGE_START + 1;
+        long rangePerThread = totalNumbers / numThreads;
+        long remainder = totalNumbers % numThreads;
 
-        Thread[] hilos = new Thread[numHilos];
-        ThreadReport reporte = new ThreadReport(numHilos);
+        Thread[] threads = new Thread[numThreads];
+        ThreadReport report = new ThreadReport(numThreads);
 
-        long inicio = TOTAL_INICIO;
-        for (int i = 0; i < numHilos; i++) {
-            int idHilo = i + 1;
-            long rangoInicio = inicio;
-            long rangoFin = inicio + rangoPorHilo - 1;
+        long start = RANGE_START;
+        for (int i = 0; i < numThreads; i++) {
+            int threadId = i + 1;
+            long rangeStart = start;
+            long rangeEnd = start + rangePerThread - 1;
 
-            if (i == numHilos - 1) {
-                rangoFin = rangoFin + resto;
+            if (i == numThreads - 1) {
+                rangeEnd = rangeEnd + remainder;
             }
 
-            final long rInicioFinal = rangoInicio;
-            final long rFinFinal = rangoFin;
+            final long rStartFinal = rangeStart;
+            final long rEndFinal = rangeEnd;
 
-            System.out.println("Hilo " + idHilo + ": rango [" + rInicioFinal + " ... " + rFinFinal + "]");
+            System.out.println("Thread " + threadId + ": range [" + rStartFinal + " ... " + rEndFinal + "]");
 
-            hilos[i] = new Thread(() -> {
-                long tInicioHilo = System.currentTimeMillis();
+            threads[i] = new Thread(() -> {
+                long threadStartTime = System.currentTimeMillis();
 
-                for (long n = rInicioFinal; n <= rFinFinal; n++) {
-                    System.out.println("[Hilo-" + idHilo + "] " + n);
+                for (long n = rStartFinal; n <= rEndFinal; n++) {
+                    System.out.println("[Thread-" + threadId + "] " + n);
                 }
 
-                long tiempoMs = System.currentTimeMillis() - tInicioHilo;
+                long elapsedMs = System.currentTimeMillis() - threadStartTime;
 
-                reporte.registrar(idHilo, rInicioFinal, rFinFinal, tiempoMs);
+                report.registrar(threadId, rStartFinal, rEndFinal, elapsedMs);
             });
 
-            hilos[i].start();
-            inicio = rFinFinal + 1;
+            threads[i].start();
+            start = rEndFinal + 1;
         }
 
         System.out.println();
-        System.out.println("Todos los hilos iniciados. Esperando...");
+        System.out.println("All threads started. Waiting...");
 
-        for (int i = 0; i < numHilos; i++) {
-            hilos[i].join();
+        for (int i = 0; i < numThreads; i++) {
+            threads[i].join();
         }
 
-        reporte.imprimir();
+        report.imprimir();
     }
 
     public static void main(String[] args) throws InterruptedException {
 
-        int numHilos = 4;
+        int numThreads = 4;
         if (args.length > 0) {
             try {
-                numHilos = Integer.parseInt(args[0]);
-                if (numHilos < 1) {
-                    numHilos = 1;
+                numThreads = Integer.parseInt(args[0]);
+                if (numThreads < 1) {
+                    numThreads = 1;
                 }
             } catch (NumberFormatException e) {
-                System.err.println("Uso: java Counter <numero_de_hilos>");
+                System.err.println("Usage: java Counter <number_of_threads>");
                 System.exit(1);
             }
         }
 
-        System.out.println("CONTADOR MULTIHILO - JAVA");
+        System.out.println("MULTITHREAD COUNTER - JAVA");
         System.out.println();
 
-        long inicio = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         try {
-            ejecutar(numHilos);
+            ejecutar(numThreads);
         } catch (OutOfMemoryError e) {
-            System.err.println("ERROR: Demasiados hilos. Se agoto la memoria.");
-            System.err.println("Causa: " + e.getMessage());
+            System.err.println("ERROR: Too many threads. Memory ran out.");
+            System.err.println("Cause: " + e.getMessage());
             System.exit(2);
         }
 
-        long total = System.currentTimeMillis() - inicio;
+        long total = System.currentTimeMillis() - start;
 
-        System.out.println("Todos los hilos completados.");
-        System.out.println("Hilos usados:  " + numHilos);
-        System.out.println("Tiempo total:  " + total + " ms");
-        System.out.println("Tiempo total:  " + (total / 1000.0) + " seg");
-        System.out.println("Tiempo total:  " + (total / 60000.0) + " min");
+        System.out.println("All threads completed.");
+        System.out.println("Threads used:  " + numThreads);
+        System.out.println("Total time:    " + total + " ms");
+        System.out.println("Total time:    " + (total / 1000.0) + " sec");
+        System.out.println("Total time:    " + (total / 60000.0) + " min");
     }
 }

@@ -8,97 +8,97 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("CONTADOR MULTIHILO: JAVA vs GO");
-        System.out.println("Rango: 1 -> 50.000.000");
+        System.out.println("MULTITHREAD COUNTER: JAVA vs GO");
+        System.out.println("Range: 1 -> 50,000,000");
         System.out.println();
 
-        System.out.print("Cuantos hilos quieres usar: ");
-        int numHilos = 4;
+        System.out.print("How many threads do you want to use: ");
+        int numThreads = 4;
         try {
-            numHilos = Integer.parseInt(sc.nextLine().trim());
-            if (numHilos < 1) {
-                System.out.println("Valor invalido, usando 1 hilo.");
-                numHilos = 1;
+            numThreads = Integer.parseInt(sc.nextLine().trim());
+            if (numThreads < 1) {
+                System.out.println("Invalid value, using 1 thread.");
+                numThreads = 1;
             }
         } catch (NumberFormatException e) {
-            System.out.println("Valor invalido, usando 4 hilos.");
-            numHilos = 4;
+            System.out.println("Invalid value, using 4 threads.");
+            numThreads = 4;
         }
 
         System.out.println();
-        System.out.println("FASE 1: JAVA con " + numHilos + " hilo(s)");
+        System.out.println("PHASE 1: JAVA with " + numThreads + " thread(s)");
         System.out.println();
 
-        long tiempoJavaInicio = System.currentTimeMillis();
+        long javaStartTime = System.currentTimeMillis();
 
         try {
-            Counter.ejecutar(numHilos);
+            Counter.ejecutar(numThreads);
         } catch (OutOfMemoryError e) {
-            System.err.println("JAVA ERROR: Demasiados hilos. Se agoto la memoria.");
-            System.err.println("Causa: " + e.getMessage());
+            System.err.println("JAVA ERROR: Too many threads. Memory ran out.");
+            System.err.println("Cause: " + e.getMessage());
         }
 
-        long tiempoJavaTotal = System.currentTimeMillis() - tiempoJavaInicio;
+        long javaTotalTime = System.currentTimeMillis() - javaStartTime;
 
         System.out.println();
-        System.out.println("FASE 2: GO con " + numHilos + " goroutine(s)");
+        System.out.println("PHASE 2: GO with " + numThreads + " goroutine(s)");
         System.out.println();
 
-        long tiempoGoTotal = -1;
+        long goTotalTime = -1;
 
         try {
-            long tiempoGoInicio = System.currentTimeMillis();
+            long goStartTime = System.currentTimeMillis();
 
             ProcessBuilder pb = new ProcessBuilder(
-                    "go", "run", "counter.go", String.valueOf(numHilos)
+                    "go", "run", "counter.go", String.valueOf(numThreads)
             );
             pb.directory(new File("../go"));
             pb.redirectErrorStream(true);
 
-            Process proceso = pb.start();
+            Process process = pb.start();
 
             BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(proceso.getInputStream())
+                    new InputStreamReader(process.getInputStream())
             );
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                System.out.println(linea);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
             }
 
-            int exitCode = proceso.waitFor();
-            tiempoGoTotal = System.currentTimeMillis() - tiempoGoInicio;
+            int exitCode = process.waitFor();
+            goTotalTime = System.currentTimeMillis() - goStartTime;
 
             if (exitCode != 0) {
-                System.err.println("GO termino con codigo de error: " + exitCode);
+                System.err.println("GO finished with error code: " + exitCode);
             }
 
         } catch (Exception e) {
-            System.err.println("No se pudo ejecutar Go. Verifica que este instalado y en el PATH.");
-            System.err.println("Detalle: " + e.getMessage());
+            System.err.println("Could not run Go. Make sure it is installed and on your PATH.");
+            System.err.println("Detail: " + e.getMessage());
         }
 
         System.out.println();
-        System.out.println("RESUMEN COMPARATIVO");
+        System.out.println("COMPARATIVE SUMMARY");
         System.out.println();
-        System.out.println("Hilos usados:  " + numHilos);
+        System.out.println("Threads used:  " + numThreads);
         System.out.println();
-        System.out.println("[JAVA] Tiempo: " + tiempoJavaTotal + " ms  |  " + (tiempoJavaTotal / 1000.0) + " seg");
+        System.out.println("[JAVA] Time: " + javaTotalTime + " ms  |  " + (javaTotalTime / 1000.0) + " sec");
 
-        if (tiempoGoTotal >= 0) {
-            System.out.println("[GO]   Tiempo: " + tiempoGoTotal + " ms  |  " + (tiempoGoTotal / 1000.0) + " seg");
+        if (goTotalTime >= 0) {
+            System.out.println("[GO]   Time: " + goTotalTime + " ms  |  " + (goTotalTime / 1000.0) + " sec");
             System.out.println();
 
-            if (tiempoJavaTotal < tiempoGoTotal) {
-                double diff = (double) (tiempoGoTotal - tiempoJavaTotal) / tiempoGoTotal * 100;
-                System.out.printf("JAVA fue %.1f%% mas rapido que GO%n", diff);
-            } else if (tiempoGoTotal < tiempoJavaTotal) {
-                double diff = (double) (tiempoJavaTotal - tiempoGoTotal) / tiempoJavaTotal * 100;
-                System.out.printf("GO fue %.1f%% mas rapido que JAVA%n", diff);
+            if (javaTotalTime < goTotalTime) {
+                double diff = (double) (goTotalTime - javaTotalTime) / goTotalTime * 100;
+                System.out.printf("JAVA was %.1f%% faster than GO%n", diff);
+            } else if (goTotalTime < javaTotalTime) {
+                double diff = (double) (javaTotalTime - goTotalTime) / javaTotalTime * 100;
+                System.out.printf("GO was %.1f%% faster than JAVA%n", diff);
             } else {
-                System.out.println("Ambos tardaron exactamente lo mismo.");
+                System.out.println("Both took exactly the same amount of time.");
             }
         } else {
-            System.out.println("[GO]   No se pudo ejecutar correctamente.");
+            System.out.println("[GO]   Could not run correctly.");
         }
 
         sc.close();

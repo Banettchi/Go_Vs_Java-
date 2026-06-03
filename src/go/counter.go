@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	TOTAL_INICIO int64 = 1
-	TOTAL_FIN    int64 = 50_000_000
+	RANGE_START int64 = 1
+	RANGE_END   int64 = 50_000_000
 )
 
 func main() {
@@ -19,69 +19,69 @@ func main() {
 	if len(os.Args) > 1 {
 		n, err := strconv.Atoi(os.Args[1])
 		if err != nil || n < 1 {
-			fmt.Println("Argumento invalido. Uso: go run counter.go <numero_goroutines>")
+			fmt.Println("Invalid argument. Usage: go run counter.go <number_of_goroutines>")
 			os.Exit(1)
 		}
 		numGoroutines = n
 	}
 
-	fmt.Println("CONTADOR MULTI-GOROUTINE - GO")
-	fmt.Printf("Rango total:  %d -> %d\n", TOTAL_INICIO, TOTAL_FIN)
-	fmt.Printf("Goroutines:   %d\n", numGoroutines)
-	fmt.Printf("CPUs logicos: %d\n", runtime.NumCPU())
+	fmt.Println("MULTI-GOROUTINE COUNTER - GO")
+	fmt.Printf("Total range:   %d -> %d\n", RANGE_START, RANGE_END)
+	fmt.Printf("Goroutines:    %d\n", numGoroutines)
+	fmt.Printf("Logical CPUs:  %d\n", runtime.NumCPU())
 	fmt.Println()
 
-	totalNumeros := TOTAL_FIN - TOTAL_INICIO + 1
-	rangoPorG := totalNumeros / int64(numGoroutines)
-	resto := totalNumeros % int64(numGoroutines)
+	totalNumbers := RANGE_END - RANGE_START + 1
+	rangePerG := totalNumbers / int64(numGoroutines)
+	remainder := totalNumbers % int64(numGoroutines)
 
 	var wg sync.WaitGroup
 
-	tiempoInicio := time.Now()
+	startTime := time.Now()
 
-	inicio := TOTAL_INICIO
+	start := RANGE_START
 	for i := 0; i < numGoroutines; i++ {
-		idGoroutine := i + 1
-		fin := inicio + rangoPorG - 1
+		goroutineId := i + 1
+		end := start + rangePerG - 1
 
 		if i == numGoroutines-1 {
-			fin = fin + resto
+			end = end + remainder
 		}
 
-		rangoInicio := inicio
-		rangoFin := fin
+		rangeStart := start
+		rangeEnd := end
 
-		fmt.Printf("Goroutine %d: rango [%d ... %d]\n", idGoroutine, rangoInicio, rangoFin)
+		fmt.Printf("Goroutine %d: range [%d ... %d]\n", goroutineId, rangeStart, rangeEnd)
 
 		wg.Add(1)
-		go func(id int, rInicio int64, rFin int64) {
+		go func(id int, rStart int64, rEnd int64) {
 			defer wg.Done()
 
-			tInicioG := time.Now()
+			tStart := time.Now()
 
-			for n := rInicio; n <= rFin; n++ {
+			for n := rStart; n <= rEnd; n++ {
 				fmt.Printf("[Goroutine-%d] %d\n", id, n)
 			}
 
-			elapsed := time.Since(tInicioG)
-			fmt.Printf("Goroutine %d terminada en %d ms\n", id, elapsed.Milliseconds())
-		}(idGoroutine, rangoInicio, rangoFin)
+			elapsed := time.Since(tStart)
+			fmt.Printf("Goroutine %d finished in %d ms\n", id, elapsed.Milliseconds())
+		}(goroutineId, rangeStart, rangeEnd)
 
-		inicio = fin + 1
+		start = end + 1
 	}
 
 	fmt.Println()
-	fmt.Println("Todas las goroutines iniciadas. Esperando...")
+	fmt.Println("All goroutines started. Waiting...")
 
 	wg.Wait()
 
-	tiempoTotal := time.Since(tiempoInicio)
+	totalTime := time.Since(startTime)
 
 	fmt.Println()
-	fmt.Println("TODAS LAS GOROUTINES COMPLETADAS")
-	fmt.Printf("Goroutines usadas: %d\n", numGoroutines)
-	fmt.Printf("Rango total:       %d -> %d\n", TOTAL_INICIO, TOTAL_FIN)
-	fmt.Printf("Tiempo total:      %d ms\n", tiempoTotal.Milliseconds())
-	fmt.Printf("Tiempo total:      %.2f segundos\n", tiempoTotal.Seconds())
-	fmt.Printf("Tiempo total:      %.4f minutos\n", tiempoTotal.Minutes())
+	fmt.Println("ALL GOROUTINES COMPLETED")
+	fmt.Printf("Goroutines used: %d\n", numGoroutines)
+	fmt.Printf("Total range:     %d -> %d\n", RANGE_START, RANGE_END)
+	fmt.Printf("Total time:      %d ms\n", totalTime.Milliseconds())
+	fmt.Printf("Total time:      %.2f seconds\n", totalTime.Seconds())
+	fmt.Printf("Total time:      %.4f minutes\n", totalTime.Minutes())
 }

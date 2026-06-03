@@ -1,64 +1,58 @@
-# Comparativa de Java contra Go
+# Java vs Go — Multithreading Comparison
 
-## Que hicimos
-Hicimos una prueba practica para ver cual de los dos lenguajes es mas rapido contando numeros
-El objetivo principal es que el programa cuente desde uno hasta cincuenta millones sin saltarse nada
-Ademas tiene que mostrar cada numero en la pantalla para comprobar que si esta haciendo el trabajo
-Lo interesante es que el usuario puede elegir cuantos hilos quiere usar para ayudar en la tarea
-Al final el programa principal nos muestra los tiempos exactos que demoro cada uno
-Esto nos sirve para ver cual herramienta es mejor cuando le ponemos trabajo pesado
+## What we did
+We ran a practical test to see which of the two languages is faster at counting numbers.
+The main goal is for the program to count from one to fifty million without skipping anything.
+It also has to print every number on screen to prove that it is actually doing the work.
+The interesting part is that the user gets to choose how many threads to use.
+At the end the main program shows the exact times each one took so we can compare them properly.
 
-## Como repartimos el trabajo
-Para que la prueba sea justa dividimos la cantidad total de numeros entre los hilos que pidio el usuario
-Asi evitamos que la computadora haga el trabajo dos veces y se confunda
+## How we split the work
+To make the test fair we divided the total range of numbers between the threads the user asked for.
+This way the computer does not do the same work twice and does not get confused.
 
-| Paso del proceso | Como lo resolvimos |
+| Step | How we solved it |
 | :--- | :--- |
-| **Repartir los numeros** | A cada hilo se le da un numero de inicio y uno final para que trabajen por su cuenta sin pisarse entre ellos |
-| **Numeros sobrantes** | Si la division de las partes no es exacta los numeros que sobran se los dejamos exclusivamente al ultimo hilo |
-| **Medir los tiempos** | Tenemos un programa principal que arranca primero Java y luego Go para medir a ambos bajo las mismas reglas del juego |
+| **Splitting the numbers** | Each thread gets a start number and an end number so they each work on their own section |
+| **Leftover numbers** | If the division is not exact the remaining numbers are all assigned to the last thread |
+| **Measuring time** | There is a main program that runs Java first and then Go to measure both under the exact same conditions |
 
-## Como trabaja cada lenguaje
-Cada lenguaje tiene su propia forma de crear a los hilos por debajo
-Aunque ambos logran el mismo resultado el esfuerzo que hace la computadora es muy diferente
+## How each language handles threads
+Each language has its own internal way of creating threads under the hood.
+Even though both achieve the same result the amount of effort the computer has to make is very different.
 
-| Lenguaje | Como crea a los hilos | Como sabe que ya terminaron la tarea |
+| Language | How it creates threads | How it knows all threads finished |
 | :--- | :--- | :--- |
-| **Java** | Crea hilos completos que gastan mucha mas memoria y recursos en tu computadora | El programa principal usa un comando especial para detenerse y esperar a que todos le avisen que ya terminaron |
-| **Go** | Usa funciones virtuales muy rapidas que casi no pesan nada en la memoria de la maquina | Usa un contador interno que va bajando solito a medida que cada hilo va entregando su parte del trabajo |
+| **Java** | Creates full threads that consume a lot more memory and resources on the computer | The main program uses a special command to stop and wait until every thread reports back that it finished |
+| **Go** | Uses very fast virtual functions that barely use any memory on the computer | Uses an internal counter that goes down on its own as each thread completes its part of the work |
 
-## Que pasa si subimos la cantidad de hilos
-Aqui es donde se nota de verdad la diferencia entre usar una herramienta u otra
-Cuando le pedimos cosas exageradas a la maquina es cuando vemos cual esta mejor construida para no ponerse lenta
+## What happens when we increase the number of threads
+This is where the real difference between the two tools becomes clear.
+When we push the machine to extreme limits we see which one is better built to stay fast.
 
-| Cantidad de hilos | Que le pasa al programa hecho en Java | Que le pasa al programa hecho en Go |
+| Number of threads | What happens with Java | What happens with Go |
 | :--- | :--- | :--- |
-| **Poquitos de 1 a 10** | Funciona super bien porque la computadora tiene espacio de sobra para manejarlos a todos al mismo tiempo | Funciona muy rapido y logra hacer todo el trabajo fluidamente |
-| **Muchos de 10000 a 50000** | Se vuelve muchisimo mas lento porque le cuesta demasiado esfuerzo organizar tantos procesos al mismo tiempo | Sigue funcionando muy bien porque sus hilos son super livianos y no saturan el sistema |
-| **Una exageracion de 1 millon** | Le cuesta muchisimo esfuerzo y demora mas de una hora en terminar pero increiblemente logra finalizar todo el conteo sin fallar | Toma su tiempo pero avanza mucho mas rapido logrando terminar toda la tarea en menos de una hora demostrando un mejor rendimiento global |
+| **Very few from 1 to 10** | Works great because the computer has plenty of space to handle all of them at the same time | Works very fast and completes all the work without any trouble |
+| **A lot from 10000 to 50000** | Gets much slower because it takes too much effort to organize that many processes at the same time | Still works great because its threads are very lightweight and do not overwhelm the system |
+| **An extreme case of 1 million** | Takes a huge amount of effort and over an hour to finish but somehow still manages to complete the count without failing | Takes some time but moves much faster and finishes the entire task in under an hour showing much better performance |
 
-## El problema de la pantalla
-Hay un detalle final muy importante que frena bastante a los dos programas por igual
-El hecho de obligar a la computadora a pintar cincuenta millones de lineas de texto en la consola hace que todo se demore
-La pantalla de tu computadora siempre sera muchisimo mas lenta que el procesador interno de tu maquina
-Gran parte del tiempo que demora el programa es solo esperando a que la pantalla alcance a dibujar todos los numeros
-Aun asi cuando hacemos pruebas con millones de hilos es clarisimo que Go aguanta muchisimo mas castigo sin ponerse tan lento
+## The screen problem
+There is one important detail that slows both programs down equally.
+Forcing the computer to print fifty million lines of text on the console makes everything take longer.
+The screen is much slower than the internal processor of the computer
+and a big part of the time the program takes is just waiting for the screen to catch up and display all the numbers.
+Even so when we run tests with millions of threads it is very clear that Go handles the pressure much better without slowing down as much.
 
-## Resultados Reales de las Pruebas
-Para demostrar todo lo anterior corrimos dos pruebas reales en la terminal
-La idea fue comparar el rendimiento usando un solo hilo contra cargas masivas de cien mil y hasta un millon de hilos
+## Real Test Results
+To prove everything above we ran actual tests in the terminal.
+The idea was to compare performance using a single thread all the way up to massive loads of one hundred thousand and one million threads.
 
-| Prueba realizada | Resultado de la prueba | Conclusion del experimento |
+| Test | Results | Conclusion |
 | :--- | :--- | :--- |
-| **Prueba con 1 solo hilo** | Java demoro 2087 segundos y Go demoro 1964 segundos | Al usar un solo hilo la diferencia es muy pequena logrando que Go sea apenas un seis por ciento mas rapido |
-| **Prueba con 100000 hilos** | Java sufrio muchisimo demorando 26116 segundos mientras que Go demoro apenas 2100 segundos | Con cien mil procesos el peso tan grande de Java hizo que demorara siete horas mientras que Go lo resolvio en media hora logrando ser un noventa y dos por ciento mas veloz |
-| **Prueba extrema con 1000000 hilos** | Java logro terminar en 4060 segundos y Go termino en 2821 segundos | Aunque parezca increible ambos programas lograron soportar un millon de procesos paralelos terminando la prueba con Go siendo un treinta por ciento mas rapido que Java |
+| **Test with 1 thread** | Java took 2087 seconds and Go took 1964 seconds | With a single thread the difference is very small with Go being only about six percent faster |
+| **Test with 100000 threads** | Java struggled and took 26116 seconds while Go only took 2100 seconds | With one hundred thousand threads Java ended up taking seven hours while Go finished in half an hour making it ninety two percent faster |
+| **Extreme test with 1000000 threads** | Java finished in 4060 seconds and Go finished in 2821 seconds | Even at one million threads both programs managed to hold up and complete the task with Go finishing thirty percent faster than Java |
 
-![Prueba con 1 Hilo](images/1Hilo.png)
-![Prueba con 100 mil Hilos](images/100kHilos.png)
-![Prueba con 1 millon de Hilos](images/1MHilos.png)
-
-## Como ejecutar este proyecto
-1 Entra a la carpeta de java con el comando cd src/java
-2 Compila los archivos de Java con el comando javac *.java
-3 Ejecuta el programa principal con el comando java Main
+![Test with 1 Thread](images/1Hilo.png)
+![Test with 100 thousand Threads](images/100kHilos.png)
+![Test with 1 million Threads](images/1MHilos.png)
